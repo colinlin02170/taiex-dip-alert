@@ -13,6 +13,10 @@ on:
         description: "Print the email instead of sending it"
         type: boolean
         default: false
+      threshold:
+        description: "Alert threshold in % (use 0 to force a test email)"
+        type: string
+        default: "-3.0"
 
 concurrency:
   group: taiex-watch
@@ -31,3 +35,4 @@ jobs:
           ALERT_TO: ${{ secrets.ALERT_TO }}
           ONCE: ${{ inputs.once && '1' || '' }}
           DRY_RUN: ${{ inputs.dry_run && '1' || '' }}
+          THRESHOLD: ${{ inputs.threshold || '-3.0' }}

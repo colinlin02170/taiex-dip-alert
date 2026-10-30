@@ -1,0 +1,33 @@
+name: TAIEX dip watch
+
+on:
+  schedule:
+    - cron: "50 0 * * 1-5" # 08:50 Taipei, Mon-Fri
+  workflow_dispatch:
+    inputs:
+      once:
+        description: "Single check now (ignores market hours)"
+        type: boolean
+        default: true
+      dry_run:
+        description: "Print the email instead of sending it"
+        type: boolean
+        default: false
+
+concurrency:
+  group: taiex-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 taiex_alert.py
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_TO: ${{ secrets.ALERT_TO }}
+          ONCE: ${{ inputs.once && '1' || '' }}
+          DRY_RUN: ${{ inputs.dry_run && '1' || '' }}

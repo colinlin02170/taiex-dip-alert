@@ -2,6 +2,8 @@ name: TAIEX dip watch
 
 on:
   schedule:
+    # Backup only: GitHub's scheduler can run hours late or skip days.
+    # The primary trigger is cron-job.org calling workflow_dispatch at 08:50 Taipei.
     - cron: "50 0 * * 1-5" # 08:50 Taipei, Mon-Fri
   workflow_dispatch:
     inputs:

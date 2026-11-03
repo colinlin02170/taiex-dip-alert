@@ -147,6 +147,7 @@ def main():
     last_alert = None
     last_ok = datetime.now(TPE)
     feed_warned = False
+    started = False
 
     while True:
         now = datetime.now(TPE)
@@ -160,6 +161,13 @@ def main():
             pct = (q["price"] / q["prev"] - 1) * 100
             below = pct <= THRESHOLD
             log(f"{q['source']} {q['time']}: {q['price']:,.2f} ({pct:+.2f}%)")
+            # Heartbeat: if this email doesn't arrive on a trading day, the watcher isn't running.
+            if not started:
+                started = send(
+                    f"TAIEX watch started: {q['price']:,.2f} ({pct:+.2f}%)",
+                    f"Watching TAIEX until 13:30 Taipei. Alert threshold: {THRESHOLD:+.1f}%.\n"
+                    f"Prev close: {q['prev']:,.2f}\nSource: {q['source']}\n",
+                )
             # Alert immediately on each new cross below; remind hourly while it stays down.
             if below and (not was_below or now - last_alert >= REMIND_AFTER):
                 if alert(q, pct):
